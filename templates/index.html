@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COVID-19 Dashboard</title>
+    <style>
+        /* General container styling */
+        .container {
+            width: 90%;
+            margin: auto;
+            overflow-x: auto;
+            font-family: Arial, sans-serif;
+        }
+        /* Header styling */
+        .header {
+            text-align: center;
+            padding: 20px;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 10px 0;
+        }
+        .header p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        /* Table styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            word-wrap: break-word;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+        /* Pagination styling */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .pagination a {
+            color: #4CAF50;
+            padding: 10px 15px;
+            text-decoration: none;
+            border: 1px solid #ddd;
+            margin: 0 5px;
+            border-radius: 4px;
+        }
+        .pagination a.active {
+            background-color: #4CAF50;
+            color: white;
+            border: 1px solid #4CAF50;
+        }
+        .pagination a:hover:not(.active) {
+            background-color: #ddd;
+        }
+        /* Graph section styling */
+        .graphs {
+            margin-top: 40px;
+        }
+        .graphs h2 {
+            color: #4CAF50;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>COVID-19 Dashboard</h1>
+        <p><strong>Name:</strong> Harshitha Behera</p>
+        <p><strong>ID:</strong> 297</p>
+        <p><strong>Fall 2024 CS 5525 Cloud Computing Assignment 6</strong></p>
+    </div>
+
+    <div class="container">
+        <table id="data-table" border="1">
+            <thead>
+                <tr>
+                    <th>State</th>
+                    <th>Cases</th>
+                    <th>New Cases</th>
+                    <th>Deaths</th>
+                    <th>Positive Tests</th>
+                    <th>Case Density</th>
+                    <th>Hospital Beds</th>
+                    <th>Vaccination Completed</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in table_data %}
+                <tr>
+                    <td>{{ entry['state'] }}</td>
+                    <td>{{ entry['cases'] }}</td>
+                    <td>{{ entry['new_cases'] }}</td>
+                    <td>{{ entry['deaths'] }}</td>
+                    <td>{{ entry['positive_tests'] }}</td>
+                    <td>{{ entry['case_density'] }}</td>
+                    <td>{{ entry['hospital_beds'] }}</td>
+                    <td>{{ entry['vaccination_completed'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination"></div>
+
+        <!-- Graphs Section -->
+        <div class="graphs">
+            <h2>Graphs</h2>
+            <div id="newcase_plot">{{ new_case_graph|safe }}</div>
+            <div id="starebcase_plot">{{ starebcase_graph|safe }}</div>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript for pagination
+        const table = document.getElementById('data-table');
+        const rows = table.getElementsByTagName('tr');
+        const pageSize = 30;
+
+        function displayPage(page) {
+            const startIndex = (page - 1) * pageSize + 1; // Skip the header row
+            const endIndex = Math.min(startIndex + pageSize, rows.length);
+
+            for (let i = 1; i < rows.length; i++) { // Start from row 1 to skip the header
+                rows[i].style.display = i >= startIndex && i < endIndex ? '' : 'none';
+            }
+        }
+
+        function createPagination() {
+            const pageCount = Math.ceil((rows.length - 1) / pageSize); // Exclude header row
+            let paginationHTML = '';
+
+            for (let i = 1; i <= pageCount; i++) {
+                paginationHTML += `<a href="#" onclick="displayPage(${i})" class="${i === 1 ? 'active' : ''}">${i}</a>`;
+            }
+
+            document.getElementById('pagination').innerHTML = paginationHTML;
+
+            // Add active class toggle
+            const links = document.querySelectorAll('.pagination a');
+            links.forEach((link, index) => {
+                link.addEventListener('click', () => {
+                    links.forEach(l => l.classList.remove('active'));
+                    links[index].classList.add('active');
+                });
+            });
+        }
+
+        createPagination();
+        displayPage(1);
+    </script>
+</body>
+</html>
